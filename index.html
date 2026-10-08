@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>LetItTap</title>
-<meta name="description" content="LetItTap is an Android app that does tasks on your phone for you. Type what you want into a floating bubble and it taps, types and fills in forms, step by step, while you watch.">
+<meta name="description" content="LetItTap is an Android app that does tasks on your phone for you. Tap a floating bubble, say or type what you want, and it taps, types and fills in forms, step by step, while you watch.">
 <link rel="canonical" href="https://letittap.com/">
-<meta name="theme-color" content="#ffd84d">
+<meta name="theme-color" content="#ffd84d" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1c16" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LetItTap">
 <meta property="og:url" content="https://letittap.com/">
@@ -61,7 +62,12 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; overflow-x: clip; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--live); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 24px; }
+::selection { background: var(--ink); color: var(--paper); }
+.top ::selection, .contact ::selection { background: var(--band-ink); color: var(--band); }
+a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.skip { position: absolute; left: 16px; top: -100px; z-index: 50; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.skip:focus-visible { top: 16px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
 
 /* ---------- hero ---------- */
 .top { background: var(--band); color: var(--band-ink); }
@@ -81,15 +87,18 @@ a { color: inherit; text-underline-offset: 3px; }
 .note { font-size: 0.92rem; opacity: 0.8; }
 
 /* phone (signature) */
-.stage { display: grid; justify-items: center; }
+.stage { display: grid; justify-items: center; gap: 22px; }
+.demo-toggle { font: inherit; font-size: 0.85rem; font-weight: 600; color: inherit; background: transparent; border: 0; padding: 6px 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; opacity: 0.8; }
+.demo-toggle:hover { opacity: 1; }
+.phone.paused, .phone.paused * { animation-play-state: paused !important; }
 .phone { position: relative; width: min(290px, 74vw); aspect-ratio: 9 / 18.5; background: var(--phone); border-radius: 42px; padding: 11px; box-shadow: 0 30px 60px -22px rgb(0 0 0 / 0.5); transform: rotate(-3deg); }
 .screen { position: relative; height: 100%; background: var(--screen); border-radius: 32px; overflow: hidden; color: #17160f; }
-.sbar { display: flex; justify-content: space-between; padding: 12px 20px 0; font-size: 0.68rem; font-weight: 700; }
+.sbar { display: flex; justify-content: space-between; padding: 12px 20px 0; font-size: 0.7rem; font-weight: 700; }
 .app { padding: 12px 18px; }
 .app .app-title { margin: 6px 0 2px; font-size: 1.02rem; font-weight: 700; }
 .app .sub { margin: 0 0 14px; font-size: 0.72rem; color: #6b695f; }
 .field { margin-bottom: 10px; }
-.field label { display: block; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b695f; margin-bottom: 3px; }
+.field .lbl { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b695f; margin-bottom: 3px; }
 .box { height: 34px; border: 1.5px solid var(--field-line); background: var(--field); border-radius: 9px; padding: 0 10px; display: flex; align-items: center; font-size: 0.8rem; white-space: nowrap; overflow: hidden; }
 .box.focus { border-color: #17160f; background: #fff; }
 .box.focus::after { content: ""; width: 1.5px; height: 15px; background: #17160f; margin-left: 1px; animation: blink 0.9s steps(1) infinite; }
@@ -107,7 +116,7 @@ a { color: inherit; text-underline-offset: 3px; }
 .voice { position: absolute; right: 18px; bottom: calc(17% + 62px); width: 76%; background: #17160f; color: #fff; border-radius: 18px; padding: 12px 14px 13px; z-index: 6; box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.45); transform-origin: 88% 100%; transform: scale(0.6); opacity: 0; transition: transform 0.25s ease, opacity 0.2s; pointer-events: none; }
 .voice.show { transform: scale(1); opacity: 1; }
 .voice::after { content: ""; position: absolute; right: 22px; bottom: -6px; width: 12px; height: 12px; background: #17160f; transform: rotate(45deg); }
-.voice-top { display: flex; align-items: center; gap: 8px; font-size: 0.68rem; font-weight: 700; color: #ffd84d; margin-bottom: 6px; }
+.voice-top { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; color: #ffd84d; margin-bottom: 6px; }
 .wave { display: flex; align-items: center; gap: 2px; height: 14px; }
 .wave i { width: 3px; height: 4px; border-radius: 2px; background: #ffd84d; }
 .voice.listening .wave i { animation: wave 0.9s ease-in-out infinite; }
@@ -118,7 +127,7 @@ a { color: inherit; text-underline-offset: 3px; }
 @keyframes halo { from { transform: scale(0.9); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
 .status-line { transition: opacity 0.3s; }
 .status-line.off { opacity: 0; }
-.status-line { position: absolute; left: 12px; right: 12px; bottom: 16px; background: rgb(23 22 15 / 0.93); color: #ffd84d; font-family: var(--f-mono); font-size: 0.6rem; line-height: 1.45; border-radius: 10px; padding: 8px 10px; z-index: 2; }
+.status-line { position: absolute; left: 12px; right: 12px; bottom: 16px; background: rgb(23 22 15 / 0.93); color: #ffd84d; font-family: var(--f-mono); font-size: 0.7rem; line-height: 1.45; border-radius: 10px; padding: 8px 10px; z-index: 2; }
 .status-line span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .status-line .ask { color: #fff; opacity: 0.7; }
 .ripple { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; pointer-events: none; z-index: 4; }
@@ -171,6 +180,7 @@ a { color: inherit; text-underline-offset: 3px; }
 .mail { font-family: var(--f-mono); font-size: clamp(0.95rem, 2.6vw, 1.25rem); background: var(--band-soft); padding: 12px 18px; border-radius: 12px; user-select: all; overflow-wrap: anywhere; }
 .copy { font: inherit; font-weight: 700; border: 2px solid currentColor; background: transparent; color: inherit; border-radius: 12px; padding: 10px 18px; cursor: pointer; }
 .copy:hover { background: var(--band-ink); color: var(--band); }
+.copy:active, .btn:active { transform: translateY(1px); }
 
 footer { padding-block: 28px 40px; font-size: 0.88rem; color: var(--muted); }
 footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; }
@@ -183,18 +193,19 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   .contact { padding-block: 64px; }
 }
 @media (max-width: 480px) {
-  .wrap { padding-inline: 16px; }
+  .wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
   .log li { grid-template-columns: 22px minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <header class="top">
   <div class="wrap">
     <nav class="nav" aria-label="Main">
-      <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"></span>LetItTap</a>
+      <a class="logo" href="#top" translate="no"><span class="logo-mark" aria-hidden="true"></span>LetItTap</a>
       <a class="plain" href="#contact">Become a tester</a>
     </nav>
 
@@ -208,8 +219,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
         </div>
       </div>
 
-      <div class="stage" role="img" aria-label="Animation: someone asks LetItTap out loud to fill in a job application form, and it fills in the form and submits it">
-        <div class="phone">
+      <div class="stage">
+        <div class="phone" id="phone" role="img" aria-label="Animation: someone asks LetItTap out loud to fill in a job application form, and it fills in the form and submits it">
           <div class="bubble" id="bubble"></div>
           <div class="voice" id="voice"><div class="voice-top"><span class="wave"><i></i><i></i><i></i><i></i><i></i></span><span id="voiceLabel">Listening…</span></div><p id="transcript"></p></div>
           <div class="screen" id="screen">
@@ -217,29 +228,30 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
             <div class="app">
               <div class="app-title">Apply: Product Intern</div>
               <p class="sub">Northwind Labs · Pune</p>
-              <div class="field"><label>Full name</label><div class="box" id="f-name"></div></div>
-              <div class="field"><label>Email</label><div class="box" id="f-mail"></div></div>
-              <div class="field"><label>Phone</label><div class="box" id="f-phone"></div></div>
-              <div class="field"><label>City</label><div class="box" id="f-city"></div></div>
+              <div class="field"><span class="lbl">Full name</span><div class="box" id="f-name"></div></div>
+              <div class="field"><span class="lbl">Email</span><div class="box" id="f-mail"></div></div>
+              <div class="field"><span class="lbl">Phone</span><div class="box" id="f-phone"></div></div>
+              <div class="field"><span class="lbl">City</span><div class="box" id="f-city"></div></div>
               <div class="submit" id="f-submit">Submit application</div>
             </div>
-            <div class="sent" id="sent"><div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg></div><b>Application sent</b><small>We'll reply to your email.</small></div>
+            <div class="sent" id="sent"><div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg></div><b>Application sent</b><small>We’ll reply to your email.</small></div>
             <div class="status-line off" id="statusLine"><span class="ask" id="askLine">Fill this form with my details and submit</span><span id="status">Reading the screen…</span></div>
           </div>
         </div>
+        <button class="demo-toggle" id="demoToggle" type="button" aria-pressed="false">Pause demo</button>
       </div>
     </div>
   </div>
 </header>
 
-<main>
+<main id="main">
   <section class="sec" aria-labelledby="how">
     <div class="wrap split">
       <div>
         <h2 id="how">It works the way you do: one tap at a time.</h2>
         <p class="muted">There are no special connections to other apps. LetItTap looks at what is on the screen, picks the next tap or bit of typing, does it, then looks again to check it worked. That is why it can work in almost any app.</p>
         <ul class="facts">
-          <li>The bubble stays bright yellow so you can always spot it over any app. It turns red while it's working; tap it to stop.</li>
+          <li>The bubble stays bright yellow so you can always spot it over any app. It turns red while it’s working; tap it to stop.</li>
           <li>You see every step in a line of text under the bubble.</li>
           <li>Most everyday jobs take between 3 and 15 steps.</li>
           <li>Ask out loud or type, whichever is easier at the time.</li>
@@ -247,7 +259,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
         </ul>
       </div>
       <div class="log" aria-label="Example task, step by step">
-        <div class="log-head">“Tell Riya I'm running 10 minutes late”<small>What LetItTap did, step by step</small></div>
+        <div class="log-head">“Tell Riya I’m running 10 minutes late”<small>What LetItTap did, step by step</small></div>
         <ol>
           <li><span class="n">1</span><span>Opened <em>WhatsApp</em></span></li>
           <li><span class="n">2</span><span>Tapped <em>Search</em></span></li>
@@ -268,8 +280,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <ul class="asks">
         <li>Fill in this sign-up form with my details</li>
         <li>Turn on dark mode</li>
-        <li>Add a 6 pm alarm called gym</li>
-        <li>Search for tomorrow's weather in Pune</li>
+        <li>Add a 6&nbsp;pm alarm called gym</li>
+        <li>Search for tomorrow’s weather in Pune</li>
         <li>Find my latest invoice in Gmail</li>
         <li>Turn off notifications for Instagram</li>
       </ul>
@@ -278,12 +290,12 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
   <section class="sec" id="privacy" aria-labelledby="priv">
     <div class="wrap">
-      <h2 id="priv">What it can see, and what it won't do</h2>
-      <p class="muted">LetItTap needs Android's Accessibility permission to read the screen and tap for you. Here is exactly how that permission is used.</p>
+      <h2 id="priv">What it can see, and what it won’t do</h2>
+      <p class="muted">LetItTap needs Android’s Accessibility permission to read the screen and tap for you. Here is exactly how that permission is used.</p>
       <dl class="rules">
         <div><dt>It only acts when you ask</dt><dd>Nothing happens until you start a task from the bubble. When the task ends or you tap stop, it stops reading the screen.</dd></div>
         <div><dt>Text, not screenshots</dt><dd>During a task, the text on the current screen is sent to the AI model (Claude, by Anthropic) to choose the next step. No images are taken.</dd></div>
-        <div><dt>No accounts, no servers of ours</dt><dd>LetItTap talks to the AI model directly from your phone. We don't run servers, and we don't keep a copy of anything you do.</dd></div>
+        <div><dt>No accounts, no servers of ours</dt><dd>LetItTap talks to the AI model directly from your phone. We don’t run servers, and we don’t keep a copy of anything you do.</dd></div>
         <div><dt>No payments, deleting or passwords</dt><dd>It refuses to pay, buy, delete or type passwords. When a task needs one of those, it stops and tells you.</dd></div>
       </dl>
     </div>
@@ -292,11 +304,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
 <section class="contact" id="contact" aria-labelledby="who">
   <div class="wrap">
-    <h2 id="who">Hi, I'm Mihir Vaze</h2>
-    <p>I'm building LetItTap because most of what I do on my phone is the same few taps in the same few apps. The first Android build is close. If you'd like to try it, email me with the phone model you use and I'll send it to you as soon as it's ready.</p>
+    <h2 id="who">Hi, I’m Mihir Vaze</h2>
+    <p>I’m building LetItTap because most of what I do on my phone is the same few taps in the same few apps. The first Android build is close. If you’d like to try it, email me with the phone model you use and I’ll send it to you as soon as it’s ready.</p>
     <div class="mailrow">
-      <span class="mail" id="mail">hello@letittap.com</span>
-      <button class="copy" id="copy" type="button">Copy email</button>
+      <span class="mail" id="mail" translate="no">hello@letittap.com</span>
+      <button class="copy" id="copy" type="button" aria-live="polite">Copy email</button>
     </div>
   </div>
 </section>
@@ -338,13 +350,25 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   });
 
   if (reduce) {
+    $('demoToggle').hidden = true;
     fields.forEach(([id, v]) => { $(id).textContent = v; });
     status.textContent = 'Filled 4 fields. Tapping Submit next.';
     statusLine.classList.remove('off');
     return;
   }
 
-  const wait = ms => new Promise(r => setTimeout(r, ms));
+  let paused = false;
+  const phone = $('phone'), toggle = $('demoToggle');
+  toggle.addEventListener('click', () => {
+    paused = !paused;
+    phone.classList.toggle('paused', paused);
+    toggle.setAttribute('aria-pressed', String(paused));
+    toggle.textContent = paused ? 'Play demo' : 'Pause demo';
+  });
+  const wait = async ms => {
+    await new Promise(r => setTimeout(r, ms));
+    while (paused) await new Promise(r => setTimeout(r, 150));
+  };
   const tap = el => {
     const s = screen.getBoundingClientRect(), b = el.getBoundingClientRect();
     const dot = document.createElement('span');
