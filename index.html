@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LetItTap</title>
+<meta name="description" content="LetItTap is an Android app that does tasks on your phone for you. Type what you want into a floating bubble and it taps, types and fills in forms, step by step, while you watch.">
+<meta property="og:title" content="LetItTap">
+<meta property="og:description" content="Tell your phone what to do. It taps, types and fills in forms for you.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23ffd84d'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%2317160f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a sun-yellow hero holding a phone that operates itself, then four plain sections (how it works, what to ask, privacy, who builds it) on quiet paper. Display face only in the hero and logo. */
+:root {
+  --paper: #f7f7f2; --ink: #17160f; --muted: #5b594f; --line: #dddbd0; --card: #ffffff;
+  --band: #ffd84d; --band-ink: #17160f; --band-soft: #ffe68a;
+  --live: #d93a24; --done: #1d8f50;
+  --phone: #17160f; --screen: #ffffff; --field: #f1f1ec; --field-line: #d6d4ca;
+  --f-display: "Dela Gothic One", "Arial Black", Impact, sans-serif;
+  --f-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "Martian Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12120e; --ink: #f2f0e6; --muted: #a8a596; --line: #2d2c25; --card: #1b1a15;
+    --band: #1d1c16; --band-ink: #ffd84d; --band-soft: #2b2a20;
+    --live: #ff6a52; --done: #4cc382;
+    --phone: #050504; --screen: #fbfbf8; --field: #efefe9; --field-line: #d0cec3;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12120e; --ink: #f2f0e6; --muted: #a8a596; --line: #2d2c25; --card: #1b1a15;
+  --band: #1d1c16; --band-ink: #ffd84d; --band-soft: #2b2a20;
+  --live: #ff6a52; --done: #4cc382;
+  --phone: #050504; --screen: #fbfbf8; --field: #efefe9; --field-line: #d0cec3;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; overflow-x: clip; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--live); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 24px; }
+
+/* ---------- hero ---------- */
+.top { background: var(--band); color: var(--band-ink); }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: 1.2rem; text-decoration: none; }
+.logo-mark { width: 26px; height: 26px; border-radius: 50%; background: var(--band-ink); position: relative; flex: none; }
+.logo-mark::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--band); }
+.nav a.plain { font-weight: 600; font-size: 0.95rem; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 40px; align-items: center; padding-block: 36px 96px; }
+.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(2.5rem, 6.2vw, 5rem); line-height: 1; letter-spacing: -0.01em; margin: 0 0 26px; }
+.hero h1 span { display: block; }
+.lede { font-size: 1.2rem; font-weight: 500; max-width: 34ch; margin: 0 0 30px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
+.btn { display: inline-block; text-decoration: none; font-weight: 700; background: var(--band-ink); color: var(--band); padding: 13px 22px; border-radius: 12px; }
+.btn:hover { opacity: 0.88; }
+.note { font-size: 0.92rem; opacity: 0.8; }
+
+/* phone (signature) */
+.stage { display: grid; justify-items: center; }
+.phone { position: relative; width: min(290px, 74vw); aspect-ratio: 9 / 18.5; background: var(--phone); border-radius: 42px; padding: 11px; box-shadow: 0 30px 60px -22px rgb(0 0 0 / 0.5); transform: rotate(-3deg); }
+.screen { position: relative; height: 100%; background: var(--screen); border-radius: 32px; overflow: hidden; color: #17160f; }
+.sbar { display: flex; justify-content: space-between; padding: 12px 20px 0; font-size: 0.68rem; font-weight: 700; }
+.app { padding: 12px 18px; }
+.app h3 { margin: 6px 0 2px; font-size: 1.02rem; }
+.app .sub { margin: 0 0 14px; font-size: 0.72rem; color: #6b695f; }
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b695f; margin-bottom: 3px; }
+.box { height: 34px; border: 1.5px solid var(--field-line); background: var(--field); border-radius: 9px; padding: 0 10px; display: flex; align-items: center; font-size: 0.8rem; white-space: nowrap; overflow: hidden; }
+.box.focus { border-color: #17160f; background: #fff; }
+.box.focus::after { content: ""; width: 1.5px; height: 15px; background: #17160f; margin-left: 1px; animation: blink 0.9s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.submit { margin-top: 14px; height: 38px; border-radius: 10px; background: #17160f; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 0.82rem; }
+.sent { position: absolute; inset: 0; background: var(--screen); display: grid; place-content: center; text-align: center; gap: 8px; padding: 24px; opacity: 0; transition: opacity 0.35s; }
+.sent.show { opacity: 1; }
+.sent .tick { width: 54px; height: 54px; border-radius: 50%; background: var(--done); color: #fff; display: grid; place-items: center; margin: 0 auto; }
+.sent .tick svg { width: 26px; height: 26px; }
+.sent small { color: #6b695f; font-size: 0.75rem; }
+.bubble { position: absolute; right: 22px; bottom: 17%; width: 48px; height: 48px; border-radius: 50%; background: #ffd84d; display: grid; place-items: center; box-shadow: 0 6px 16px rgb(0 0 0 / 0.28); z-index: 5; transition: background 0.25s; }
+.bubble::after { content: ""; width: 16px; height: 16px; border-radius: 50%; background: #17160f; transition: border-radius 0.25s, background 0.25s; }
+.bubble.run { background: var(--live); }
+.bubble.run::after { border-radius: 3px; background: #fff; width: 14px; height: 14px; }
+.voice { position: absolute; right: 18px; bottom: calc(17% + 62px); width: 76%; background: #17160f; color: #fff; border-radius: 18px; padding: 12px 14px 13px; z-index: 6; box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.45); transform-origin: 88% 100%; transform: scale(0.6); opacity: 0; transition: transform 0.25s ease, opacity 0.2s; pointer-events: none; }
+.voice.show { transform: scale(1); opacity: 1; }
+.voice::after { content: ""; position: absolute; right: 22px; bottom: -6px; width: 12px; height: 12px; background: #17160f; transform: rotate(45deg); }
+.voice-top { display: flex; align-items: center; gap: 8px; font-size: 0.68rem; font-weight: 700; color: #ffd84d; margin-bottom: 6px; }
+.wave { display: flex; align-items: center; gap: 2px; height: 14px; }
+.wave i { width: 3px; height: 4px; border-radius: 2px; background: #ffd84d; }
+.voice.listening .wave i { animation: wave 0.9s ease-in-out infinite; }
+.wave i:nth-child(2) { animation-delay: 0.15s !important; } .wave i:nth-child(3) { animation-delay: 0.3s !important; } .wave i:nth-child(4) { animation-delay: 0.45s !important; } .wave i:nth-child(5) { animation-delay: 0.6s !important; }
+@keyframes wave { 50% { height: 14px; } }
+.voice p { margin: 0; font-size: 0.86rem; line-height: 1.35; min-height: 2.7em; }
+.bubble.listen::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid #ffd84d; animation: halo 1.1s ease-out infinite; }
+@keyframes halo { from { transform: scale(0.9); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+.status-line { transition: opacity 0.3s; }
+.status-line.off { opacity: 0; }
+.status-line { position: absolute; left: 12px; right: 12px; bottom: 16px; background: rgb(23 22 15 / 0.93); color: #ffd84d; font-family: var(--f-mono); font-size: 0.6rem; line-height: 1.45; border-radius: 10px; padding: 8px 10px; z-index: 2; }
+.status-line span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-line .ask { color: #fff; opacity: 0.7; }
+.ripple { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; pointer-events: none; z-index: 4; }
+.ripple::before, .ripple::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
+.ripple::before { background: rgb(23 22 15 / 0.5); animation: dot 0.6s ease-out forwards; }
+.ripple::after { border: 2px solid rgb(23 22 15 / 0.65); animation: ring 0.7s ease-out forwards; }
+@keyframes dot { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1); opacity: 0; } }
+@keyframes ring { from { transform: scale(0.5); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+
+/* ---------- sections ---------- */
+.sec { padding-block: 96px; border-bottom: 1px solid var(--line); }
+.sec h2 { font-weight: 800; font-size: clamp(1.75rem, 3.4vw, 2.5rem); line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 16px; max-width: 20ch; text-wrap: balance; }
+.sec p { max-width: 58ch; margin: 0 0 16px; }
+.muted { color: var(--muted); }
+.split { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: start; }
+.split > * { min-width: 0; }
+
+/* how it works: real task log */
+.log { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.log-head { padding: 16px 20px; border-bottom: 1px solid var(--line); font-weight: 600; }
+.log-head small { display: block; font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.log ol { list-style: none; margin: 0; padding: 8px 0; }
+.log li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 20px; font-size: 0.95rem; }
+.log li .n { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.log li em { font-style: normal; font-family: var(--f-mono); font-size: 0.78rem; background: var(--paper); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+.log .fin { margin: 0; padding: 14px 20px; border-top: 1px solid var(--line); font-weight: 600; color: var(--done); display: flex; align-items: center; gap: 8px; }
+.log .fin .ico { width: 18px; height: 18px; flex: none; }
+.status-line svg { width: 1.1em; height: 1.1em; vertical-align: -0.2em; margin-right: 0.3em; }
+.facts { margin: 28px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+.facts li { padding-left: 18px; position: relative; }
+.facts li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+
+/* what to ask */
+.asks { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+.asks li { padding: 16px 0; border-top: 1px solid var(--line); font-size: 1.08rem; }
+.asks li::before { content: "“"; color: var(--muted); }
+.asks li::after { content: "”"; color: var(--muted); }
+
+/* privacy */
+.rules { margin: 28px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+.rules div { min-width: 0; }
+.rules dt { font-weight: 700; margin-bottom: 4px; }
+.rules dd { margin: 0; color: var(--muted); }
+
+/* founder + contact */
+.contact { background: var(--band); color: var(--band-ink); padding-block: 88px; }
+.contact h2 { font-weight: 800; font-size: clamp(1.75rem, 3.4vw, 2.5rem); line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 16px; }
+.contact p { max-width: 54ch; margin: 0 0 16px; }
+.mailrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+.mail { font-family: var(--f-mono); font-size: clamp(0.95rem, 2.6vw, 1.25rem); background: var(--band-soft); padding: 12px 18px; border-radius: 12px; user-select: all; overflow-wrap: anywhere; }
+.copy { font: inherit; font-weight: 700; border: 2px solid currentColor; background: transparent; color: inherit; border-radius: 12px; padding: 10px 18px; cursor: pointer; }
+.copy:hover { background: var(--band-ink); color: var(--band); }
+
+footer { padding-block: 28px 40px; font-size: 0.88rem; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; }
+
+@media (max-width: 880px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 48px; padding-block: 20px 72px; }
+  .split { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .asks, .rules { grid-template-columns: minmax(0, 1fr); }
+  .sec { padding-block: 64px; }
+  .contact { padding-block: 64px; }
+}
+@media (max-width: 480px) {
+  .wrap { padding-inline: 16px; }
+  .log li { grid-template-columns: 22px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"></span>LetItTap</a>
+      <a class="plain" href="#contact">Become a tester</a>
+    </nav>
+
+    <div class="hero" id="top">
+      <div>
+        <h1><span>Tell your phone.</span><span>It does the tapping.</span></h1>
+        <p class="lede">LetItTap is an Android app that does small jobs on your phone for you. Tap the floating bubble and say or type what you want. It opens the right app, taps, types and fills in forms while you watch.</p>
+        <div class="actions">
+          <a class="btn" href="#contact">Become a tester</a>
+          <span class="note">In development. First Android build coming soon.</span>
+        </div>
+      </div>
+
+      <div class="stage" role="img" aria-label="Animation: someone asks LetItTap out loud to fill in a job application form, and it fills in the form and submits it">
+        <div class="phone">
+          <div class="bubble" id="bubble"></div>
+          <div class="voice" id="voice"><div class="voice-top"><span class="wave"><i></i><i></i><i></i><i></i><i></i></span><span id="voiceLabel">Listening…</span></div><p id="transcript"></p></div>
+          <div class="screen" id="screen">
+            <div class="sbar"><span>9:41</span><span>5G</span></div>
+            <div class="app">
+              <h3>Apply: Product Intern</h3>
+              <p class="sub">Northwind Labs · Pune</p>
+              <div class="field"><label>Full name</label><div class="box" id="f-name"></div></div>
+              <div class="field"><label>Email</label><div class="box" id="f-mail"></div></div>
+              <div class="field"><label>Phone</label><div class="box" id="f-phone"></div></div>
+              <div class="field"><label>City</label><div class="box" id="f-city"></div></div>
+              <div class="submit" id="f-submit">Submit application</div>
+            </div>
+            <div class="sent" id="sent"><div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg></div><b>Application sent</b><small>We'll reply to your email.</small></div>
+            <div class="status-line off" id="statusLine"><span class="ask" id="askLine">Fill this form with my details and submit</span><span id="status">Reading the screen…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="sec" aria-labelledby="how">
+    <div class="wrap split">
+      <div>
+        <h2 id="how">It works the way you do: one tap at a time.</h2>
+        <p class="muted">There are no special connections to other apps. LetItTap looks at what is on the screen, picks the next tap or bit of typing, does it, then looks again to check it worked. That is why it can work in almost any app.</p>
+        <ul class="facts">
+          <li>The bubble stays bright yellow so you can always spot it over any app. It turns red while it's working; tap it to stop.</li>
+          <li>You see every step in a line of text under the bubble.</li>
+          <li>Most everyday jobs take between 3 and 15 steps.</li>
+          <li>Ask out loud or type, whichever is easier at the time.</li>
+          <li>Tap the bubble while it works and it stops straight away.</li>
+        </ul>
+      </div>
+      <div class="log" aria-label="Example task, step by step">
+        <div class="log-head">“Tell Riya I'm running 10 minutes late”<small>What LetItTap did, step by step</small></div>
+        <ol>
+          <li><span class="n">1</span><span>Opened <em>WhatsApp</em></span></li>
+          <li><span class="n">2</span><span>Tapped <em>Search</em></span></li>
+          <li><span class="n">3</span><span>Typed <em>Riya</em></span></li>
+          <li><span class="n">4</span><span>Tapped <em>Riya Sharma</em></span></li>
+          <li><span class="n">5</span><span>Typed <em>Running 10 minutes late</em></span></li>
+          <li><span class="n">6</span><span>Tapped <em>Send</em></span></li>
+        </ol>
+        <p class="fin"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg>Sent “Running 10 minutes late” to Riya Sharma</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="ask">
+    <div class="wrap">
+      <h2 id="ask">Jobs that usually take a dozen taps</h2>
+      <p class="muted">What the first version is being built and tested on.</p>
+      <ul class="asks">
+        <li>Fill in this sign-up form with my details</li>
+        <li>Turn on dark mode</li>
+        <li>Add a 6 pm alarm called gym</li>
+        <li>Search for tomorrow's weather in Pune</li>
+        <li>Find my latest invoice in Gmail</li>
+        <li>Turn off notifications for Instagram</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="privacy" aria-labelledby="priv">
+    <div class="wrap">
+      <h2 id="priv">What it can see, and what it won't do</h2>
+      <p class="muted">LetItTap needs Android's Accessibility permission to read the screen and tap for you. Here is exactly how that permission is used.</p>
+      <dl class="rules">
+        <div><dt>It only acts when you ask</dt><dd>Nothing happens until you start a task from the bubble. When the task ends or you tap stop, it stops reading the screen.</dd></div>
+        <div><dt>Text, not screenshots</dt><dd>During a task, the text on the current screen is sent to the AI model (Claude, by Anthropic) to choose the next step. No images are taken.</dd></div>
+        <div><dt>No accounts, no servers of ours</dt><dd>LetItTap talks to the AI model directly from your phone. We don't run servers, and we don't keep a copy of anything you do.</dd></div>
+        <div><dt>No payments, deleting or passwords</dt><dd>It refuses to pay, buy, delete or type passwords. When a task needs one of those, it stops and tells you.</dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<section class="contact" id="contact" aria-labelledby="who">
+  <div class="wrap">
+    <h2 id="who">Hi, I'm Mihir Vaze</h2>
+    <p>I'm building LetItTap because most of what I do on my phone is the same few taps in the same few apps. The first Android build is close. If you'd like to try it, email me with the phone model you use and I'll send it to you as soon as it's ready.</p>
+    <div class="mailrow">
+      <span class="mail" id="mail">hello@letittap.in</span>
+      <button class="copy" id="copy" type="button">Copy email</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 LetItTap · Pune, India</span>
+    <span><a href="#privacy">Privacy</a> · Built with Claude</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg>';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const screen = $('screen'), bubble = $('bubble'), status = $('status'), sent = $('sent');
+  const voice = $('voice'), transcript = $('transcript'), voiceLabel = $('voiceLabel'), statusLine = $('statusLine');
+  const COMMAND = 'Fill this form with my details and submit';
+  const fields = [
+    ['f-name', 'Aarav Mehta'],
+    ['f-mail', 'aarav.mehta@gmail.com'],
+    ['f-phone', '98200 41736'],
+    ['f-city', 'Pune'],
+  ];
+
+  $('copy').addEventListener('click', async () => {
+    const btn = $('copy');
+    try {
+      await navigator.clipboard.writeText($('mail').textContent.trim());
+      btn.textContent = 'Copied';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents($('mail'));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      btn.textContent = 'Selected';
+    }
+    setTimeout(() => { btn.textContent = 'Copy email'; }, 2000);
+  });
+
+  if (reduce) {
+    fields.forEach(([id, v]) => { $(id).textContent = v; });
+    status.textContent = 'Filled 4 fields. Tapping Submit next.';
+    statusLine.classList.remove('off');
+    return;
+  }
+
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const tap = el => {
+    const s = screen.getBoundingClientRect(), b = el.getBoundingClientRect();
+    const dot = document.createElement('span');
+    dot.className = 'ripple';
+    dot.style.left = (b.left - s.left + b.width * 0.35) + 'px';
+    dot.style.top = (b.top - s.top + b.height / 2) + 'px';
+    screen.appendChild(dot);
+    setTimeout(() => dot.remove(), 800);
+  };
+  const type = async (el, text) => { for (const ch of text) { el.textContent += ch; await wait(45 + Math.random() * 50); } };
+  const focus = id => fields.forEach(([f]) => $(f).classList.toggle('focus', f === id));
+
+  (async function loop() {
+    for (;;) {
+      fields.forEach(([id]) => { $(id).textContent = ''; });
+      focus(null);
+      sent.classList.remove('show');
+      statusLine.classList.add('off');
+      transcript.textContent = '';
+      voiceLabel.textContent = 'Listening…';
+      await wait(1400);
+      tap(bubble);
+      await wait(250);
+      bubble.classList.add('listen');
+      voice.classList.add('show', 'listening');
+      await wait(700);
+      for (const word of COMMAND.split(' ')) {
+        transcript.textContent += (transcript.textContent ? ' ' : '') + word;
+        await wait(170 + Math.random() * 90);
+      }
+      await wait(600);
+      voice.classList.remove('listening');
+      bubble.classList.remove('listen');
+      voiceLabel.textContent = 'Got it';
+      await wait(700);
+      voice.classList.remove('show');
+      await wait(250);
+      bubble.classList.add('run');
+      statusLine.classList.remove('off');
+      status.textContent = 'Reading the screen…';
+      await wait(1300);
+      for (const [id, value] of fields) {
+        const label = $(id).previousElementSibling.textContent;
+        status.textContent = `Typing your ${label.toLowerCase()}`;
+        tap($(id));
+        await wait(250);
+        focus(id);
+        await type($(id), value);
+        await wait(350);
+      }
+      focus(null);
+      status.textContent = 'Tapping Submit application';
+      tap($('f-submit'));
+      await wait(500);
+      sent.classList.add('show');
+      status.textContent = 'Checking the screen…';
+      await wait(900);
+      status.innerHTML = CHECK + 'Application sent';
+      bubble.classList.remove('run');
+      await wait(3400);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
